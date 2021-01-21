@@ -10,7 +10,7 @@ export type State = {
   page: number;
   totalResults: number;
   totalPages: number;
-  favourites: any;
+  favourites: Array<object>;
   searchString: string;
 };
 export const state: State = {

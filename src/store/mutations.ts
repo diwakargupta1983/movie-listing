@@ -20,7 +20,7 @@ export type Mutations = {
   [MutationType.SetPage](state: State, value: number): void;
   [MutationType.SetTotalResults](state: State, value: number): void;
   [MutationType.SetTotalPages](state: State, value: number): void;
-  [MutationType.SetFavorites](state: State, movies: Movie[]): void;
+  [MutationType.SetFavorites](state: State, movies: any): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {

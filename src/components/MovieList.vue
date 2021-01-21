@@ -90,6 +90,7 @@ import { ActionTypes } from "@/store/actions";
 import { Movie } from "@/store/state";
 
 export default defineComponent({
+  name: "MovieList",
   components: {
     Pagination,
     SearchBar,

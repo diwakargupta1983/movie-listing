@@ -1,88 +1,109 @@
 <template>
   <div>
-    <input type="text" v-model="state.searchString" class="border" />
-    <button class="border" @click="searchMovieByTitle">Search</button>
-    <button class="border" @click="clearSearch">Clear search</button>
-    <br />
-    ::{{ pageNumber }} ::{{ totalPages }}
-    <button
-      :disabled="pageNumber <= 1"
-      @click="getNextOrPreviousPage('previous')"
-      class="border"
-    >
-      Previous
-    </button>
-    ||
-    <button
-      :disabled="pageNumber >= totalPages"
-      @click="getNextOrPreviousPage('next')"
-      class="border"
-    >
-      Next
-    </button>
-    <br />
-    {{ loading }}
-    {{ totalMovieCount }}
-    {{ moviesList }}
-    <div
-      class="bg-yellow-200 my-2"
-      v-for="movie in moviesList"
-      :key="movie.imdbID"
-    >
-      <h2>{{ movie.Title }}</h2>
-      <h3>{{ movie.Year }}</h3>
-      <h4>{{ movie.imdbID }}</h4>
-      <p @click="markAsFavourite(movie)">Star</p>
+    <SearchBar />
+    <div class="flex flex-col">
+      <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+          <div
+            class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"
+          >
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Title
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Year
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    IMDB ID
+                  </th>
+                  <th scope="col" class="relative px-6 py-3">
+                    <span class="sr-only">Mark as favourite</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="movie in moviesList" :key="movie.imdbID">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {{ movie.Title }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {{ movie.Year }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    {{ movie.imdbID }}
+                  </td>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
+                  >
+                    <a
+                      href="javascript:void(0)"
+                      class="text-indigo-600 hover:text-indigo-900"
+                      @click="toggleAsFavourite(movie)"
+                      title="Mark as favourite"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 text-red-600"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                          clip-rule="evenodd"
+                        />
+                      </svg>
+                    </a>
+                  </td>
+                </tr>
+                <tr v-if="!moviesList.length">
+                  <td colspan="4" class="text-center">No data found !</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
-    <div v-if="!moviesList.length">No data found</div>
+    <Pagination />
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive } from "vue";
+import { computed, defineComponent } from "vue";
+import Pagination from "@/components/Pagination.vue";
+import SearchBar from "@/components/SearchBar.vue";
 import { useStore } from "@/store";
 import { ActionTypes } from "@/store/actions";
 import { Movie } from "@/store/state";
 
 export default defineComponent({
+  components: {
+    Pagination,
+    SearchBar,
+  },
   setup() {
-    const state = reactive({
-      searchString: "",
-    });
     const store = useStore();
-    const pageNumber = computed(() => store.state.pageNumber);
-    const totalPages = computed(() => store.state.totalPages);
-    const loading = computed(() => store.state.loading);
-    const totalMovieCount = computed(() => store.getters.totalMovieCount);
     const moviesList = computed(() => store.getters.moviesList);
-    const getNextOrPreviousPage = (change: string) => {
-      const nextPageData = { change, searchString: state.searchString };
-      store.dispatch(ActionTypes.GetNextOrPreviousPage, nextPageData);
-    };
-    const searchMovieByTitle = () =>
-      store.dispatch(ActionTypes.SearchMovieByTitle, state.searchString);
-    const clearSearch = () => {
-      state.searchString = "";
-      store.dispatch(ActionTypes.GetALLMovies);
-    };
-    const markAsFavourite = (favorite: Movie[]) =>
+    const toggleAsFavourite = (favorite: Movie[]) =>
       store.dispatch(ActionTypes.ToggleMovieAsFavourite, favorite);
 
     return {
-      loading,
-      totalMovieCount,
       moviesList,
-      getNextOrPreviousPage,
-      pageNumber,
-      searchMovieByTitle,
-      state,
-      totalPages,
-      clearSearch,
-      markAsFavourite,
+      toggleAsFavourite,
     };
   },
 });
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss"></style>

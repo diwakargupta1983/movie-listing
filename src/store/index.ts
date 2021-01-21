@@ -3,26 +3,26 @@ import {
   Store as VuexStore,
   CommitOptions,
   DispatchOptions,
-  createLogger
-} from 'vuex'
-import { State, state } from './state'
-import { Mutations, mutations } from './mutations'
-import { Actions, actions } from './actions'
-import { Getters, getters } from './getters'
- 
+  createLogger,
+} from "vuex";
+import { State, state } from "./state";
+import { Mutations, mutations } from "./mutations";
+import { Actions, actions } from "./actions";
+import { Getters, getters } from "./getters";
+
 export const store = createStore<State>({
-  plugins: process.env.NODE_ENV === 'development' ? [createLogger()] : [],
+  plugins: process.env.NODE_ENV === "development" ? [createLogger()] : [],
   state,
   mutations,
   actions,
-  getters
-})
+  getters,
+});
 export function useStore() {
-  return store as Store
+  return store as Store;
 }
 export type Store = Omit<
   VuexStore<State>,
-  'getters' | 'commit' | 'dispatch'
+  "getters" | "commit" | "dispatch"
 > & {
   commit<K extends keyof Mutations, P extends Parameters<Mutations[K]>[1]>(
     key: K,
@@ -39,4 +39,4 @@ export type Store = Omit<
   getters: {
     [K in keyof Getters]: ReturnType<Getters[K]>;
   };
-}
+};
